@@ -13,12 +13,14 @@ import RankingList from './RankingList';
 export default function Ranking() {
     const { user } = useContext(UserContext);
     const [list, setList] = useState([]);
+	const [allInfos, setAllInfos] = useState({});
 	const [loading, setLoading] = useState(false);
 
     async function getRanking() {
 		setLoading(true);
         try {
             const { data } = await getAllInfos(user.token);
+			setAllInfos(data);
 
             const ranking = [];
             for (const user of Object.keys(data)) {
@@ -40,7 +42,7 @@ export default function Ranking() {
                     pontos: total,
                 });
             }
-            
+
             setList(ranking.sort((a, b) => {
                 if (a.pontos - b.pontos > 0) return -1;
                 if (a.pontos - b.pontos < 0) return 1;
@@ -59,7 +61,7 @@ export default function Ranking() {
     return (
         <>
             {list.length > 0 ? 
-				<RankingList list={list} />
+				<RankingList list={list} allInfos={allInfos} />
 				:
 				(loading ?
 					<CircularProgress />
@@ -90,7 +92,7 @@ function rollback(infos) {
 		boaAcao: {},
 	};
 
-	for (const info of infos) {
+	for (const {...info} of infos) {
         const week = info.week;
         delete info.week;
         delete info.id;

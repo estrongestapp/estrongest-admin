@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import {
     Table,
     TableBody,
@@ -9,11 +9,38 @@ import {
     Paper
 } from '@mui/material';
 
+import DetailedInfo from './DetailedInfo';
+
 function createData(posicao, nome, pontos) {
   return { posicao, nome, pontos };
 }
 
-export default function RankingList({ list }) {
+export default function RankingList({ list, allInfos }) {
+    const [userName, setUserName] = useState('');
+    const [userDetailed, setUserDetailed] = useState();
+
+    function changeUserDetailed(nome) {
+        setUserName(nome)
+        setUserDetailed(allInfos[nome]);
+    }
+
+    function back() {
+        setUserName('');
+        setUserDetailed();
+    }
+
+    return (
+        <>
+            {userDetailed ? 
+                <DetailedInfo info={userDetailed.sort((a, b) => a.week - b.week)} nome={userName} back={back} />
+                :
+                <RankingTable list={list} changeUserDetailed={changeUserDetailed} />
+            }
+        </>
+    );
+}
+
+function RankingTable({ list, changeUserDetailed }) {
     const rows = list.map((user, index) => createData(index + 1, user.nome, user.pontos));
 
     return (
@@ -30,13 +57,13 @@ export default function RankingList({ list }) {
                     <TableBody>
                         {rows.map((row) => (
                             <TableRow
-                            key={row.posicao}
-                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                key={row.posicao}
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
                                 <TableCell component="th" scope="row">
                                     {row.posicao}
                                 </TableCell>
-                                <TableCell>{row.nome}</TableCell>
+                                <TableCell sx={{ cursor: 'pointer' }} onClick={() => changeUserDetailed(row.nome)}>{row.nome}</TableCell>
                                 <TableCell align="right">{row.pontos}</TableCell>
                             </TableRow>
                         ))}
