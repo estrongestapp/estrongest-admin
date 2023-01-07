@@ -27,13 +27,15 @@ export default function Ranking() {
                 const correctFormat = rollback(data[user]);
 
                 const startWeek = moment('2022-06-20').utc(true).week();
-                const thisWeek = moment().utc(true).week();
+                const week = moment().utc(true).week();
+    			const thisWeek = week < startWeek ? moment('2022-12-30').utc(true).week() + week : week;
 
                 let total = 0;
                 for (let i = startWeek; i <= thisWeek ; i++) {
                     const relativeWeek = i - startWeek;
                     const multiplier = 2 ** Math.floor(relativeWeek / 5);
-                    const weekPoints = calculatePoints(correctFormat, i);
+					const weekToCalculate = i > moment('2022-12-30').utc(true).week() ? i - moment('2022-12-30').utc(true).week() : i;
+                    const weekPoints = calculatePoints(correctFormat, weekToCalculate);
                     total += weekPoints * multiplier;
                 }
 
